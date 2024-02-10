@@ -77,7 +77,7 @@ class App extends Component {
               <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
               <Stack.Screen name="Register" component={RegisterScreen} />
               <Stack.Screen name="Home" component={HomeScreen} options={HomeScreen.navigationOptions} />
-              <Stack.Screen name="Add" component={AddScreen} />
+              <Stack.Screen name="AddScreen" component={AddScreen} options={{ headerShown: false }} />
             </Stack.Navigator>
           </NavigationContainer>
         </Provider>
@@ -89,7 +89,7 @@ class App extends Component {
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Home" screenOptions={globalScreenOptions}>
             <Stack.Screen name="Home" component={HomeScreen} options={HomeScreen.navigationOptions} />
-            <Stack.Screen name="Add" component={AddScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="AddScreen" component={AddScreen} options={{  }} />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>
