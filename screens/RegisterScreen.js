@@ -37,6 +37,7 @@ const RegisterScreen = ({navigation}) => {
 
 
     return (
+        
         <KeyboardAvoidingView behavior ="padding" style={styles.container} >
             <StatusBar style='dark'/>
             <Image 

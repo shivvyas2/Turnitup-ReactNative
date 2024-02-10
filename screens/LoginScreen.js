@@ -78,11 +78,12 @@ const styles = StyleSheet.create({
         flex:1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding:10,
+        padding:50,
         backgroundColor:'#FFF6E9',
 
     },
     image:{
+        
         width: 300,
         height: 300,
         

@@ -1,41 +1,108 @@
+import React, { Component } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+
+// Containers
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+// Screens
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
+import AddScreen from './screens/AddScreen';
 
+// Redux
+import { Provider } from 'react-redux';
+import { applyMiddleware, createStore } from 'redux';
+import rootReducer from './redux/reducers';
+import { thunk } from 'redux-thunk';
+import { users } from './redux/reducers/users';
 
+// Firebase
+import firebase from './firebase';
+import { auth } from './firebase';
+
+// Create the store with middleware
+const store = createStore(rootReducer, applyMiddleware(thunk));
 
 const Stack = createNativeStackNavigator();
 
-const globalScreenOptions ={
-    headerStyle:{backgroundColor: "#FFF6E9" },
-    headerTitleStyle: {color: "#222222"},
-    headerTintColor: {color: "#222222"},
+const globalScreenOptions = {
+  headerStyle: { backgroundColor: '#FFF' },
+  headerTitleStyle: { color: '#222222' },
+  headerTintColor: { color: '#222222' },
+};
 
-}
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      loaded: false,
+    };
+  }
 
-export default function App() {
-  return (
-       <NavigationContainer>
-            <Stack.Navigator 
-            // initialRouteName='Chat'
-            // initialRouteName= "Home"
-             screenOptions = {globalScreenOptions}>
-            <Stack.Screen name = "Login" component = {LoginScreen}/>
-            <Stack.Screen name = "Register" component = {RegisterScreen}/>
-            <Stack.Screen name = "Home" component = {HomeScreen}/>
+  componentDidMount() {
+    auth.onAuthStateChanged((users) => {
+      if (!users) {
+        this.setState({
+          loggedIn: false,
+          loaded: true,
+        });
+      } else {
+        this.setState({
+          loggedIn: true,
+          loaded: true,
+        });
+      }
+    });
+  }
+
+  render() {
+    const { loggedIn, loaded } = this.state;
+
+    if (!loaded) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <Text>Loading</Text>
+        </View>
+      );
+    }
+
+    if (!loggedIn) {
+      return (
+        <Provider store={store}>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Login" screenOptions={globalScreenOptions}>
+              <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="Register" component={RegisterScreen} />
+              <Stack.Screen name="Home" component={HomeScreen} options={HomeScreen.navigationOptions} />
+              <Stack.Screen name="Add" component={AddScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </Provider>
+      );
+    }
+
+    return (
+      <Provider store={store}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Home" screenOptions={globalScreenOptions}>
+            <Stack.Screen name="Home" component={HomeScreen} options={HomeScreen.navigationOptions} />
+            <Stack.Screen name="Add" component={AddScreen} options={{ headerShown: false }} />
           </Stack.Navigator>
-      </NavigationContainer>
-  );
+        </NavigationContainer>
+      </Provider>
+    );
+  }
 }
+
+export default App;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF6E9',
+    backgroundColor: '#FCFDF2',
     alignItems: 'center',
     justifyContent: 'center',
   },
