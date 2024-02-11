@@ -5,7 +5,7 @@ import { StyleSheet, Text, View, Button, Image } from 'react-native';
 import { Input } from 'react-native-elements';
 import { KeyboardAvoidingView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import {auth} from '../firebase';
+import {auth, storage} from '../firebase';
 
 
 const LoginScreen = ({navigation}) => {
