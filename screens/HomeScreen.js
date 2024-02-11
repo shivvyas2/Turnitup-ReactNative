@@ -1,27 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  Image,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-  Linking,
-} from 'react-native';
+import { View, Text, TextInput, Button, Image, TouchableOpacity, FlatList, StyleSheet, Linking } from 'react-native';
 import Carousel from 'react-native-snap-carousel';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
+// Adjust the path based on your actual file structure
 
 // Assuming your images are in the 'assets/subject' folder
 const getSubjectImage = (courseName) => {
   switch (courseName.toLowerCase()) {
-    case 'concepts of internet computing':
-      return require('../assets/subjects/1.png');
-    case 'Financing_101':
-      return require('../assets/subjects/2.png');
-    case 'mathematical_foundations':
+    case 'cs 612 - concepts of internet computing':
+      return require('../assets/computer.jpeg');
+    case 'mar 625 marketing management':
+      return require('../assets/marketing.png');
+    case 'mathematical foundations':
       return require('../assets/subjects/3.png');
     // Add more cases for other subjects as needed
     default:
@@ -33,13 +25,13 @@ const getSubjectImage = (courseName) => {
 const dummyAssignments = [
   {
     id: '1',
-    courseName: 'Concepts of Internet Computing',
-    instructorName: 'Prof. William',
+    courseName: 'CS 612 - Concepts of Internet Computing',
+    instructorName: 'Prof. Vandovich',
     universityName: 'Pace University',
   },
   {
     id: '2',
-    courseName: 'Financing 101',
+    courseName: 'MAR 625 Marketing Management',
     instructorName: 'Dr. Johnson',
     universityName: 'NYIT University',
   },
@@ -54,6 +46,7 @@ const dummyAssignments = [
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
 
   // Function to open a link using Linking
   const openLink = (url) => {
@@ -83,12 +76,13 @@ const HomeScreen = () => {
         </TouchableOpacity>
       ),
       headerLeft: () => (
-        <TouchableOpacity onPress={() => navigation.navigate('LoginScreen')}>
+        <TouchableOpacity onPress={() => dispatch(logout())}>
           <AntDesign name="logout" size={24} color="black" style={styles.headerIcon} />
         </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, dispatch]);
+
   // Render individual recent assignment item
   const renderRecentAssignment = ({ item }) => (
     <TouchableOpacity style={styles.recentItem} onPress={() => openLink('https://drive.google.com')}>
@@ -152,7 +146,7 @@ const styles = StyleSheet.create({
   recentItem: {
     padding: 20,
     borderRadius: 20,
-    backgroundColor: '#b4d2ee',
+    backgroundColor: '#f7f7f7',
     width: '100%',
     marginBottom: 20,
   },
@@ -187,14 +181,14 @@ const styles = StyleSheet.create({
   searchButton: {
     backgroundColor: 'black',
     width: 200,
-    alignContent:"center",
-    justifyContent:"center",
+    alignContent: "center",
+    justifyContent: "center",
     padding: 5,
-    margin:10,
+    margin: 10,
     borderColor: "black",
     borderRadius: 5,
     shadowRadius: 1,
-    shadowColor:"#7743DB",
+    shadowColor: "#7743DB",
   },
   noAssignments: {
     fontSize: 18,
