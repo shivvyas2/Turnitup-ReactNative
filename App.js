@@ -10,7 +10,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import HomeScreen from './screens/HomeScreen';
-import AddScreen from './screens/AddScreen';
+import Upload from './screens/Upload';
 
 // Redux
 import { Provider } from 'react-redux';
@@ -77,7 +77,7 @@ class App extends Component {
               <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
               <Stack.Screen name="Register" component={RegisterScreen} />
               <Stack.Screen name="Home" component={HomeScreen} options={HomeScreen.navigationOptions} />
-              <Stack.Screen name="AddScreen" component={AddScreen} options={{ headerShown: false }} />
+              <Stack.Screen name="Upload" component={Upload} options={{ headerShown: false }} />
             </Stack.Navigator>
           </NavigationContainer>
         </Provider>
@@ -89,7 +89,7 @@ class App extends Component {
         <NavigationContainer>
           <Stack.Navigator initialRouteName="Home" screenOptions={globalScreenOptions}>
             <Stack.Screen name="Home" component={HomeScreen} options={HomeScreen.navigationOptions} />
-            <Stack.Screen name="AddScreen" component={AddScreen} options={{  }} />
+            <Stack.Screen name="Upload" component={Upload} options={{  }} />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>

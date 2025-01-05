@@ -1,122 +1,128 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, TextInput, Button, Image, TouchableOpacity, FlatList, StyleSheet, Linking } from 'react-native';
+import Carousel from 'react-native-snap-carousel';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { AntDesign } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
+// Adjust the path based on your actual file structure
 
-import firebase from './../firebase';
+// Assuming your images are in the 'assets/subject' folder
+const getSubjectImage = (courseName) => {
+  switch (courseName.toLowerCase()) {
+    case 'cs 612 - concepts of internet computing':
+      return require('../assets/computer.jpeg');
+    case 'mar 625 marketing management':
+      return require('../assets/marketing.png');
+    case 'mathematical foundations':
+      return require('../assets/subjects/3.png');
+    // Add more cases for other subjects as needed
+    default:
+      return null;
+  }
+};
+
+// Sample data for recent assignments
+const dummyAssignments = [
+  {
+    id: '1',
+    courseName: 'CS 612 - Concepts of Internet Computing',
+    instructorName: 'Prof. Vandovich',
+    universityName: 'Pace University',
+  },
+  {
+    id: '2',
+    courseName: 'MAR 625 Marketing Management',
+    instructorName: 'Dr. Johnson',
+    universityName: 'NYIT University',
+  },
+  {
+    id: '3',
+    courseName: 'Mathematical Foundations',
+    instructorName: 'Prof. Brown',
+    universityName: 'Columbia University',
+  },
+  // Add more dummy assignments as needed
+];
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  const [recentAssignments, setRecentAssignments] = useState([]);
-  const [courseName, setCourseName] = useState('');
-  const [instructorName, setInstructorName] = useState('');
-  const [universityName, setUniversityName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
+  // Function to open a link using Linking
+  const openLink = (url) => {
+    Linking.openURL(url).catch((err) => console.error('An error occurred', err));
+  };
+
+  // Fetch recent assignments or perform other operations on focus
+  useFocusEffect(() => {
     const fetchRecentAssignments = async () => {
-      setIsLoading(true);
-      try {
-        const snapshot = await firebase.database().ref('assignments').once('value');
-        const assignments = snapshot.val() || [];
-        setRecentAssignments(assignments.reverse());
-      } catch (error) {
-        console.error('Error fetching recent assignments:', error);
-      } finally {
-        setIsLoading(false);
-      }
+      // Fetch logic here
     };
 
     fetchRecentAssignments();
-  }, []);
 
-  const handleSearch = async () => {
-    setIsLoading(true);
-    try {
-      let query = firebase.database().ref('assignments');
+    // Cleanup logic if needed
+    return () => {
+      // Cleanup logic if needed
+    };
+  });
 
-      if (courseName) {
-        query = query.orderByChild('courseName').equalTo(courseName);
-      }
-
-      if (instructorName) {
-        query = query.orderByChild('instructorName').equalTo(instructorName);
-      }
-
-      if (universityName) {
-        query = query.orderByChild('universityName').equalTo(universityName);
-      }
-
-      const snapshot = await query.once('value');
-      const searchedAssignments = snapshot.val() || [];
-      setRecentAssignments(searchedAssignments);
-    } catch (error) {
-      console.error('Error searching assignments:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Set navigation options, including the headerRight button
   useEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <AntDesign
-          name="pluscircle"
-          size={24}
-          color="black"
-          onPress={() => navigation.navigate('AddScreen')}
-          style={{ marginRight: 15 }}
-        />
+        <TouchableOpacity onPress={() => navigation.navigate('Upload')}>
+          <AntDesign name="pluscircle" size={24} color="black" style={styles.headerIconLeft} />
+        </TouchableOpacity>
+      ),
+      headerLeft: () => (
+        <TouchableOpacity onPress={() => dispatch(logout())}>
+          <AntDesign name="logout" size={24} color="black" style={styles.headerIcon} />
+        </TouchableOpacity>
       ),
     });
-  }, [navigation]);
+  }, [navigation, dispatch]);
 
+  // Render individual recent assignment item
   const renderRecentAssignment = ({ item }) => (
-    <View style={styles.recentItem}>
-      <Text style={styles.recentItemTitle}>{item.courseName}</Text>
-      <Text style={styles.recentItemDetails}>
-        {item.instructorName} - {item.universityName}
-      </Text>
-    </View>
+    <TouchableOpacity style={styles.recentItem} onPress={() => openLink('https://drive.google.com')}>
+      <Image source={getSubjectImage(item.courseName)} style={styles.recentItemImage} />
+      <View style={styles.textContainer}>
+        <Text style={styles.recentItemTitle}>{item.courseName}</Text>
+        <Text style={styles.recentItemSubtitle}>
+          Instructor: {item.instructorName}
+        </Text>
+        <Text style={styles.recentItemSubtitle}>
+          University: {item.universityName}
+        </Text>
+      </View>
+    </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.recentsContainer}>
-        <FlatList
-          data={recentAssignments}
-          renderItem={renderRecentAssignment}
-          keyExtractor={(item) => item.id}
-          horizontal
-        />
-      </View>
+      <Text style={styles.sectionTitle}>Featured Courses</Text>
+      <Carousel
+        data={dummyAssignments}
+        renderItem={renderRecentAssignment}
+        keyExtractor={(item) => item.id}
+        sliderWidth={350}
+        itemWidth={300}
+        itemHeight={200}
+        layout={'default'}
+        layoutCardOffset={18}
+        contentContainerCustomStyle={styles.carouselContentContainer}
+      />
 
       <View style={styles.searchContainer}>
-        <TextInput
-          placeholder="Course Name"
-          value={courseName}
-          onChangeText={setCourseName}
-          style={styles.searchInput}
-        />
-        <TextInput
-          placeholder="Instructor Name"
-          value={instructorName}
-          onChangeText={setInstructorName}
-          style={styles.searchInput}
-        />
-        <TextInput
-          placeholder="University Name"
-          value={universityName}
-          onChangeText={setUniversityName}
-          style={styles.searchInput}
-        />
-        <Button title="Submit" onPress={handleSearch} style={styles.searchButton} />
+        <TextInput placeholder="Course Name" style={styles.searchInput} />
+        <TextInput placeholder="Instructor Name" style={styles.searchInput} />
+        <TextInput placeholder="University Name" style={styles.searchInput} />
+        <Button title="Search" onPress={() => {}} color="#841584" style={styles.searchButton} />
       </View>
 
-      {recentAssignments.length === 0 && (
-        <Text style={styles.noAssignments}>
-          No recent assignments found. Search or add some!
-        </Text>
+      {dummyAssignments.length === 0 && (
+        <Text style={styles.noAssignments}>No recent assignments found. Search or add some!</Text>
       )}
     </View>
   );
@@ -128,43 +134,80 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 20,
   },
-  recentsContainer: {
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 20,
-    height: 100,
+    color: 'black',
   },
-  searchContainer: {
-    marginBottom: 20,
-  },
-  searchInput: {
-    marginBottom: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: '#ccc',
-  },
-  searchButton: {
-    marginBottom: 10,
+  carouselContentContainer: {
+    alignItems: 'center',
   },
   recentItem: {
-    marginRight: 10,
-    padding: 15,
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: '#ccc',
+    padding: 20,
+    borderRadius: 20,
+    backgroundColor: '#f7f7f7',
+    width: '100%',
+    marginBottom: 20,
+  },
+  recentItemImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 20,
+    marginBottom: 10,
   },
   recentItemTitle: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 8,
+    color: 'black',
   },
   recentItemDetails: {
-    fontSize: 12,
+    fontSize: 16,
+    color: 'black',
+  },
+  searchContainer: {
+    marginBottom: 40,
+  },
+  searchInput: {
+    marginBottom: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 16,
+    borderWidth: 2,
+    borderRadius: 8,
+    borderColor: 'black',
+    fontSize: 16,
+  },
+  searchButton: {
+    backgroundColor: 'black',
+    width: 200,
+    alignContent: "center",
+    justifyContent: "center",
+    padding: 5,
+    margin: 10,
+    borderColor: "black",
+    borderRadius: 5,
+    shadowRadius: 1,
+    shadowColor: "#7743DB",
   },
   noAssignments: {
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 40,
+    color: 'black',
+  },
+  headerIcon: {
+    marginLeft: 10,
+  },
+  headerIconLeft: {
+    marginRight: 10,
+  },
+  textContainer: {
+    marginLeft: 15,
+  },
+  recentItemSubtitle: {
+    fontSize: 14,
+    color: 'black',
   },
 });
 
