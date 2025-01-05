@@ -24,10 +24,10 @@ A cross-platform mobile application built using **React Native**, enabling stude
      git clone <repository-url>
 2. Navigate to the project directory:
     ```bash
-    cd notes-sharing-app
+      cd notes-sharing-app
 3. Install dependencies:
    ```bash
-   npm install
+     npm install
 4. Start the development server:
    ```bash
-    npx expo start
+     npx expo start
